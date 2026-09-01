@@ -26,16 +26,37 @@ export default function WorkColumn({
 
         <button
           type="button"
-          className="rounded-md p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-700 focus-visible:outline-2"
+          className="
+            rounded-md
+            p-1.5
+            text-gray-400
+            transition
+            hover:bg-gray-200
+            hover:text-gray-700
+            focus-visible:outline-2
+          "
           aria-label={`Add work to ${title}`}
         >
           +
         </button>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div
+        className="
+          flex
+          max-h-[calc(100vh-230px)]
+          min-h-[200px]
+          flex-col
+          gap-3
+          overflow-y-auto
+          pr-1
+        "
+      >
         {items.map((item) => (
-          <WorkCard key={item.id} item={item} />
+          <WorkCard
+            key={item.id}
+            item={item}
+          />
         ))}
       </div>
     </section>

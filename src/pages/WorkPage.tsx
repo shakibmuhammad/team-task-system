@@ -1,5 +1,6 @@
 import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import WorkBoard from "../components/work/WorkBoard";
+import { workItems } from "../data/fixtures";
 
 export default function WorkPage() {
   return (
@@ -12,7 +13,7 @@ export default function WorkPage() {
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              6 items · 4 workflow stages
+              {workItems.length} items · 8 members
             </p>
           </div>
         </div>
