@@ -6,7 +6,6 @@ export type Member = {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
 };
 
 export type WorkItem = {
