@@ -1,13 +1,9 @@
-import {
-  ArrowUpDown,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ArrowUpDown, Search, SlidersHorizontal, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import WorkBoard from "../components/work/WorkBoard";
 import { workItems, members } from "../data/fixtures";
 import type { Priority, WorkStatus } from "../types/work";
+import MobileFilterSheet from "../components/work/MobileFilterSheet";
 
 const PAGE_SIZE = 20;
 
@@ -45,11 +41,7 @@ export default function WorkPage() {
     .filter((item) => {
       if (!query) return true;
 
-      const searchText = [
-        item.title,
-        item.description,
-        item.owner?.name,
-      ]
+      const searchText = [item.title, item.description, item.owner?.name]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -77,35 +69,23 @@ export default function WorkPage() {
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
 
-        return (
-          new Date(a.dueDate).getTime() -
-          new Date(b.dueDate).getTime()
-        );
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       }
 
       return Number(b.id) - Number(a.id);
     });
 
   const totalItems = filteredItems.length;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalItems / PAGE_SIZE)
-  );
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
 
-  const safePage = Math.min(
-    Math.max(page, 1),
-    totalPages
-  );
+  const safePage = Math.min(Math.max(page, 1), totalPages);
 
   const paginatedItems = filteredItems.slice(
     (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE
+    safePage * PAGE_SIZE,
   );
 
-  function updateParam(
-    key: string,
-    value: string | null
-  ) {
+  function updateParam(key: string, value: string | null) {
     const nextParams = new URLSearchParams(searchParams);
 
     if (value) {
@@ -126,10 +106,7 @@ export default function WorkPage() {
   }
 
   const hasFilters =
-    Boolean(query) ||
-    Boolean(status) ||
-    Boolean(owner) ||
-    Boolean(priority);
+    Boolean(query) || Boolean(status) || Boolean(owner) || Boolean(priority);
 
   return (
     <div>
@@ -140,8 +117,7 @@ export default function WorkPage() {
         </h2>
 
         <p className="mt-1 text-sm text-gray-500">
-          {totalItems}{" "}
-          {totalItems === 1 ? "item" : "items"} found
+          {totalItems} {totalItems === 1 ? "item" : "items"} found
         </p>
       </div>
 
@@ -158,9 +134,7 @@ export default function WorkPage() {
             <input
               type="search"
               value={query}
-              onChange={(event) =>
-                updateParam("q", event.target.value)
-              }
+              onChange={(event) => updateParam("q", event.target.value)}
               placeholder="Search work or owner..."
               className="
                 h-11
@@ -187,10 +161,7 @@ export default function WorkPage() {
             <select
               value={status ?? ""}
               onChange={(event) =>
-                updateParam(
-                  "status",
-                  event.target.value || null
-                )
+                updateParam("status", event.target.value || null)
               }
               className="h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-gray-200"
               aria-label="Filter by status"
@@ -198,10 +169,7 @@ export default function WorkPage() {
               <option value="">All status</option>
 
               {statusOptions.map((option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                >
+                <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
@@ -210,10 +178,7 @@ export default function WorkPage() {
             <select
               value={owner ?? ""}
               onChange={(event) =>
-                updateParam(
-                  "owner",
-                  event.target.value || null
-                )
+                updateParam("owner", event.target.value || null)
               }
               className="h-11 max-w-[180px] rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-gray-200"
               aria-label="Filter by owner"
@@ -221,10 +186,7 @@ export default function WorkPage() {
               <option value="">All owners</option>
 
               {members.map((member) => (
-                <option
-                  key={member.id}
-                  value={member.id}
-                >
+                <option key={member.id} value={member.id}>
                   {member.name}
                 </option>
               ))}
@@ -233,10 +195,7 @@ export default function WorkPage() {
             <select
               value={priority ?? ""}
               onChange={(event) =>
-                updateParam(
-                  "priority",
-                  event.target.value || null
-                )
+                updateParam("priority", event.target.value || null)
               }
               className="h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-gray-200"
               aria-label="Filter by priority"
@@ -244,10 +203,7 @@ export default function WorkPage() {
               <option value="">All priority</option>
 
               {priorityOptions.map((option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                >
+                <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
@@ -255,9 +211,7 @@ export default function WorkPage() {
 
             <select
               value={sort}
-              onChange={(event) =>
-                updateParam("sort", event.target.value)
-              }
+              onChange={(event) => updateParam("sort", event.target.value)}
               className="h-11 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-gray-200"
               aria-label="Sort work"
             >
@@ -269,37 +223,50 @@ export default function WorkPage() {
 
           {/* Mobile controls */}
           <div className="flex gap-2 lg:hidden">
-            <button
-              type="button"
-              className="
-                inline-flex
-                min-h-11
-                flex-1
-                items-center
-                justify-center
-                gap-2
-                rounded-lg
-                border
-                border-gray-200
-                bg-white
-                px-4
-                text-sm
-                font-medium
-                text-gray-700
-                transition
-                hover:bg-gray-50
-                focus-visible:outline-2
-              "
-            >
-              <SlidersHorizontal size={16} />
-              Filters
-            </button>
+            <MobileFilterSheet
+              status={status}
+              owner={owner}
+              priority={priority}
+              onApply={({ status, owner, priority }) => {
+                const nextParams = new URLSearchParams(searchParams);
+
+                if (status) {
+                  nextParams.set("status", status);
+                } else {
+                  nextParams.delete("status");
+                }
+
+                if (owner) {
+                  nextParams.set("owner", owner);
+                } else {
+                  nextParams.delete("owner");
+                }
+
+                if (priority) {
+                  nextParams.set("priority", priority);
+                } else {
+                  nextParams.delete("priority");
+                }
+
+                nextParams.delete("page");
+
+                setSearchParams(nextParams);
+              }}
+              onReset={() => {
+                const nextParams = new URLSearchParams(searchParams);
+
+                nextParams.delete("status");
+                nextParams.delete("owner");
+                nextParams.delete("priority");
+                nextParams.delete("page");
+
+                setSearchParams(nextParams);
+              }}
+            />
 
             <select
               value={sort}
-              onChange={(event) =>
-                updateParam("sort", event.target.value)
-              }
+              onChange={(event) => updateParam("sort", event.target.value)}
               className="
                 min-h-11
                 flex-1
@@ -335,22 +302,13 @@ export default function WorkPage() {
             {status && (
               <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
                 Status:{" "}
-                {
-                  statusOptions.find(
-                    (item) => item.value === status
-                  )?.label
-                }
+                {statusOptions.find((item) => item.value === status)?.label}
               </span>
             )}
 
             {owner && (
               <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
-                Owner:{" "}
-                {
-                  members.find(
-                    (member) => member.id === owner
-                  )?.name
-                }
+                Owner: {members.find((member) => member.id === owner)?.name}
               </span>
             )}
 
@@ -380,11 +338,9 @@ export default function WorkPage() {
         <p className="text-xs text-gray-500">
           {totalItems === 0
             ? "No items"
-            : `Showing ${
-                (safePage - 1) * PAGE_SIZE + 1
-              }–${Math.min(
+            : `Showing ${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(
                 safePage * PAGE_SIZE,
-                totalItems
+                totalItems,
               )} of ${totalItems}`}
         </p>
 
@@ -392,12 +348,7 @@ export default function WorkPage() {
           <button
             type="button"
             disabled={safePage === 1}
-            onClick={() =>
-              updateParam(
-                "page",
-                String(safePage - 1)
-              )
-            }
+            onClick={() => updateParam("page", String(safePage - 1))}
             className="
               min-h-10
               rounded-lg
@@ -425,12 +376,7 @@ export default function WorkPage() {
           <button
             type="button"
             disabled={safePage === totalPages}
-            onClick={() =>
-              updateParam(
-                "page",
-                String(safePage + 1)
-              )
-            }
+            onClick={() => updateParam("page", String(safePage + 1))}
             className="
               min-h-10
               rounded-lg
