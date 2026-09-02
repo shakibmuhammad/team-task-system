@@ -43,14 +43,11 @@ export default function MobileFilterSheet({
 }: Props) {
   const [open, setOpen] = useState(false);
 
-  const [draftStatus, setDraftStatus] =
-    useState<WorkStatus | null>(status);
+  const [draftStatus, setDraftStatus] = useState<WorkStatus | null>(status);
 
-  const [draftOwner, setDraftOwner] =
-    useState<string | null>(owner);
+  const [draftOwner, setDraftOwner] = useState<string | null>(owner);
 
-  const [draftPriority, setDraftPriority] =
-    useState<Priority | null>(priority);
+  const [draftPriority, setDraftPriority] = useState<Priority | null>(priority);
 
   function handleOpenChange(value: boolean) {
     if (value) {
@@ -88,10 +85,7 @@ export default function MobileFilterSheet({
     Number(Boolean(priority));
 
   return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <button
           type="button"
@@ -118,9 +112,7 @@ export default function MobileFilterSheet({
           "
         >
           <SlidersHorizontal size={16} />
-
           Filters
-
           {activeFilterCount > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gray-900 px-1.5 text-[11px] font-semibold text-white">
               {activeFilterCount}
@@ -205,7 +197,7 @@ export default function MobileFilterSheet({
                     setDraftStatus(
                       event.target.value
                         ? (event.target.value as WorkStatus)
-                        : null
+                        : null,
                     )
                   }
                   className="
@@ -225,10 +217,7 @@ export default function MobileFilterSheet({
                   "
                 >
                   {statusOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -248,9 +237,7 @@ export default function MobileFilterSheet({
                   id="mobile-owner"
                   value={draftOwner ?? ""}
                   onChange={(event) =>
-                    setDraftOwner(
-                      event.target.value || null
-                    )
+                    setDraftOwner(event.target.value || null)
                   }
                   className="
                     min-h-11
@@ -271,10 +258,7 @@ export default function MobileFilterSheet({
                   <option value="">All owners</option>
 
                   {members.map((member) => (
-                    <option
-                      key={member.id}
-                      value={member.id}
-                    >
+                    <option key={member.id} value={member.id}>
                       {member.name}
                     </option>
                   ))}
@@ -297,7 +281,7 @@ export default function MobileFilterSheet({
                     setDraftPriority(
                       event.target.value
                         ? (event.target.value as Priority)
-                        : null
+                        : null,
                     )
                   }
                   className="
@@ -317,10 +301,7 @@ export default function MobileFilterSheet({
                   "
                 >
                   {priorityOptions.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                    >
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}

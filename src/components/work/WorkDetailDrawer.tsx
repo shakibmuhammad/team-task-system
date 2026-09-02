@@ -1,11 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Calendar,
-  CircleUserRound,
-  Clock3,
-  Pencil,
-  X,
-} from "lucide-react";
+import { Calendar, CircleUserRound, Clock3, Pencil, X } from "lucide-react";
 import type { WorkItem } from "../../types/work";
 
 type Props = {
@@ -40,10 +34,7 @@ export default function WorkDetailDrawer({
   }
 
   return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay
           className="
@@ -133,15 +124,10 @@ export default function WorkDetailDrawer({
 
             <div className="mt-7 divide-y divide-gray-100 rounded-xl border border-gray-200">
               <div className="flex items-center gap-3 px-4 py-4">
-                <CircleUserRound
-                  size={18}
-                  className="text-gray-400"
-                />
+                <CircleUserRound size={18} className="text-gray-400" />
 
                 <div>
-                  <p className="text-xs text-gray-400">
-                    Owner
-                  </p>
+                  <p className="text-xs text-gray-400">Owner</p>
 
                   <p className="mt-0.5 text-sm font-medium text-gray-800">
                     {item.owner?.name ?? "Unassigned"}
@@ -150,15 +136,10 @@ export default function WorkDetailDrawer({
               </div>
 
               <div className="flex items-center gap-3 px-4 py-4">
-                <Calendar
-                  size={18}
-                  className="text-gray-400"
-                />
+                <Calendar size={18} className="text-gray-400" />
 
                 <div>
-                  <p className="text-xs text-gray-400">
-                    Due date
-                  </p>
+                  <p className="text-xs text-gray-400">Due date</p>
 
                   <p className="mt-0.5 text-sm font-medium text-gray-800">
                     {item.dueDate ?? "No due date"}
@@ -167,15 +148,10 @@ export default function WorkDetailDrawer({
               </div>
 
               <div className="flex items-center gap-3 px-4 py-4">
-                <Clock3
-                  size={18}
-                  className="text-gray-400"
-                />
+                <Clock3 size={18} className="text-gray-400" />
 
                 <div>
-                  <p className="text-xs text-gray-400">
-                    Status
-                  </p>
+                  <p className="text-xs text-gray-400">Status</p>
 
                   <p className="mt-0.5 text-sm font-medium text-gray-800">
                     {statusLabels[item.status]}

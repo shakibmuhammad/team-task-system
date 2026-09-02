@@ -1,35 +1,58 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { Plus, X } from "lucide-react";
-import { useState } from "react";
-import type { Priority, WorkStatus } from "../../types/work";
-import { toast } from "sonner";
+import { Plus, Pencil, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { Priority, WorkItem, WorkStatus } from "../../types/work";
 
-type Props = {
-  onCreate: (data: {
-    title: string;
-    description: string;
-    status: WorkStatus;
-    priority: Priority;
-    dueDate: string;
-  }) => void;
+type WorkFormData = {
+  title: string;
+  description: string;
+  status: WorkStatus;
+  priority: Priority;
+  dueDate: string;
 };
 
-export default function CreateWorkDialog({ onCreate }: Props) {
-  const [open, setOpen] = useState(false);
+type Props = {
+  mode: "create" | "edit";
+  item?: WorkItem | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: WorkFormData) => void;
+};
 
+export default function WorkFormDialog({
+  mode,
+  item,
+  open,
+  onOpenChange,
+  onSubmit,
+}: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<WorkStatus>("backlog");
   const [priority, setPriority] = useState<Priority>("medium");
   const [dueDate, setDueDate] = useState("");
 
-  function resetForm() {
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (mode === "edit" && item) {
+      setTitle(item.title);
+      setDescription(item.description ?? "");
+      setStatus(item.status);
+      setPriority(item.priority);
+      setDueDate(item.dueDate ?? "");
+
+      return;
+    }
+
     setTitle("");
     setDescription("");
     setStatus("backlog");
     setPriority("medium");
     setDueDate("");
-  }
+  }, [open, mode, item]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,56 +61,25 @@ export default function CreateWorkDialog({ onCreate }: Props) {
       return;
     }
 
-    onCreate({
+    onSubmit({
       title: title.trim(),
       description: description.trim(),
       status,
       priority,
       dueDate,
     });
-
-    resetForm();
-    setOpen(false);
-
-    toast.success("Work created");
   }
 
-  return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <button
-          type="button"
-          className="
-            inline-flex
-            min-h-10
-            items-center
-            gap-2
-            rounded-lg
-            bg-gray-900
-            px-4
-            py-2
-            text-sm
-            font-medium
-            text-white
-            transition
-            hover:bg-gray-800
-            active:bg-gray-700
-            focus-visible:outline-2
-            focus-visible:outline-offset-2
-          "
-        >
-          <Plus size={16} />
-          <span className="hidden sm:inline">New work</span>
-          <span className="sm:hidden">New</span>
-        </button>
-      </Dialog.Trigger>
+  const isEdit = mode === "edit";
 
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay
           className="
             fixed
             inset-0
-            z-40
+            z-50
             bg-black/30
             backdrop-blur-[2px]
           "
@@ -99,10 +91,12 @@ export default function CreateWorkDialog({ onCreate }: Props) {
             left-1/2
             top-1/2
             z-50
+            max-h-[90vh]
             w-[calc(100%-2rem)]
             max-w-lg
             -translate-x-1/2
             -translate-y-1/2
+            overflow-y-auto
             rounded-2xl
             border
             border-gray-200
@@ -113,20 +107,32 @@ export default function CreateWorkDialog({ onCreate }: Props) {
         >
           <div className="flex items-start justify-between border-b border-gray-100 px-5 py-4">
             <div>
-              <Dialog.Title className="text-base font-semibold text-gray-900">
-                Create work
+              <Dialog.Title className="flex items-center gap-2 text-base font-semibold text-gray-900">
+                {isEdit ? <Pencil size={17} /> : <Plus size={17} />}
+
+                {isEdit ? "Edit work" : "Create work"}
               </Dialog.Title>
 
               <Dialog.Description className="mt-1 text-xs text-gray-500">
-                Add a new piece of work to the team backlog.
+                {isEdit
+                  ? "Update the details of this work item."
+                  : "Add a new piece of work to the team backlog."}
               </Dialog.Description>
             </div>
 
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 focus-visible:outline-2"
                 aria-label="Close"
+                className="
+                  rounded-lg
+                  p-2
+                  text-gray-400
+                  transition
+                  hover:bg-gray-100
+                  hover:text-gray-700
+                  focus-visible:outline-2
+                "
               >
                 <X size={18} />
               </button>
@@ -135,6 +141,7 @@ export default function CreateWorkDialog({ onCreate }: Props) {
 
           <form onSubmit={handleSubmit}>
             <div className="space-y-5 px-5 py-5">
+              {/* Title */}
               <div>
                 <label
                   htmlFor="work-title"
@@ -147,8 +154,8 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                   id="work-title"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="What needs to be done?"
                   required
+                  placeholder="What needs to be done?"
                   className="
                     h-11
                     w-full
@@ -166,6 +173,7 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                 />
               </div>
 
+              {/* Description */}
               <div>
                 <label
                   htmlFor="work-description"
@@ -198,6 +206,7 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                 />
               </div>
 
+              {/* Status + Priority */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label
@@ -213,11 +222,26 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                     onChange={(event) =>
                       setStatus(event.target.value as WorkStatus)
                     }
-                    className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-gray-200"
+                    className="
+                      h-11
+                      w-full
+                      rounded-lg
+                      border
+                      border-gray-200
+                      bg-white
+                      px-3
+                      text-sm
+                      outline-none
+                      focus:ring-2
+                      focus:ring-gray-200
+                    "
                   >
                     <option value="backlog">Backlog</option>
+
                     <option value="in_progress">In Progress</option>
+
                     <option value="review">Review</option>
+
                     <option value="done">Done</option>
                   </select>
                 </div>
@@ -236,7 +260,19 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                     onChange={(event) =>
                       setPriority(event.target.value as Priority)
                     }
-                    className="h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-gray-200"
+                    className="
+                      h-11
+                      w-full
+                      rounded-lg
+                      border
+                      border-gray-200
+                      bg-white
+                      px-3
+                      text-sm
+                      outline-none
+                      focus:ring-2
+                      focus:ring-gray-200
+                    "
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -246,6 +282,7 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                 </div>
               </div>
 
+              {/* Due date */}
               <div>
                 <label
                   htmlFor="work-due-date"
@@ -279,7 +316,21 @@ export default function CreateWorkDialog({ onCreate }: Props) {
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="min-h-11 flex-1 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-2"
+                  className="
+                    min-h-11
+                    flex-1
+                    rounded-lg
+                    border
+                    border-gray-200
+                    bg-white
+                    px-4
+                    text-sm
+                    font-medium
+                    text-gray-700
+                    transition
+                    hover:bg-gray-50
+                    focus-visible:outline-2
+                  "
                 >
                   Cancel
                 </button>
@@ -299,12 +350,14 @@ export default function CreateWorkDialog({ onCreate }: Props) {
                   text-white
                   transition
                   hover:bg-gray-800
+                  active:bg-gray-700
                   disabled:cursor-not-allowed
                   disabled:opacity-40
                   focus-visible:outline-2
+                  focus-visible:outline-offset-2
                 "
               >
-                Create work
+                {isEdit ? "Save changes" : "Create work"}
               </button>
             </div>
           </form>

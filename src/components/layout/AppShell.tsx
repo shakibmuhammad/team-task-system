@@ -1,4 +1,3 @@
-import { Plus } from "lucide-react";
 import CreateWorkDialog from "../work/CreateWorkDialog";
 
 type Props = {
@@ -15,7 +14,7 @@ type Props = {
 export default function AppShell({ children, onCreateWork }: Props) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
         <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
           <div>
             <h1 className="text-lg font-bold tracking-tight text-gray-900">
@@ -31,7 +30,7 @@ export default function AppShell({ children, onCreateWork }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[1400px] px-4 py-2 sm:px-6 lg:px-8">
         {children}
       </main>
     </div>

@@ -6,20 +6,20 @@ type Props = {
   status: WorkStatus;
   items: WorkItem[];
   onItemClick: (item: WorkItem) => void;
+  onStatusChange: (item: WorkItem, status: WorkStatus) => void;
 };
 
 export default function WorkColumn({
   title,
   items,
-  onItemClick
+  onItemClick,
+  onStatusChange,
 }: Props) {
   return (
     <section className="flex min-w-0 flex-col">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-gray-900">
-            {title}
-          </h2>
+          <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
 
           <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
             {items.length}
@@ -45,20 +45,21 @@ export default function WorkColumn({
 
       <div
         className="
-          flex
-          max-h-[calc(100vh-230px)]
-          min-h-[200px]
-          flex-col
-          gap-3
-          overflow-y-auto
-          pr-1
-        "
+        flex
+        min-h-[200px]
+        flex-col
+        gap-3
+        overflow-y-auto
+        pr-1
+        xl:max-h-[calc(100vh-230px)]
+    "
       >
         {items.map((item) => (
           <WorkCard
             key={item.id}
             item={item}
             onClick={() => onItemClick(item)}
+            onStatusChange={(status) => onStatusChange(item, status)}
           />
         ))}
       </div>

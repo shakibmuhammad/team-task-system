@@ -3,9 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import WorkBoard from "../components/work/WorkBoard";
 import { members } from "../data/fixtures";
 import type { Priority, WorkItem, WorkStatus } from "../types/work";
-import MobileFilterSheet from "../components/work/MobileFilterSheet";
+import MobileFilterSheet from "../components/layout/MobileFilterSheet";
 import { useState } from "react";
 import WorkDetailDrawer from "../components/work/WorkDetailDrawer";
+import WorkFormDialog from "../components/work/WorkFormDialog";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 20;
 
@@ -31,15 +33,15 @@ const priorityOptions: {
 
 type Props = {
   workItems: WorkItem[];
-  setWorkItems: React.Dispatch<
-    React.SetStateAction<WorkItem[]>
-  >;
+  setWorkItems: React.Dispatch<React.SetStateAction<WorkItem[]>>;
 };
 
 export default function WorkPage({ workItems, setWorkItems }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<WorkItem | null>(null);
+
   const [detailOpen, setDetailOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const query = searchParams.get("q") ?? "";
   const status = searchParams.get("status") as WorkStatus | null;
@@ -47,6 +49,11 @@ export default function WorkPage({ workItems, setWorkItems }: Props) {
   const priority = searchParams.get("priority") as Priority | null;
   const sort = searchParams.get("sort") ?? "created";
   const page = Number(searchParams.get("page") ?? "1");
+
+  function handleEdit() {
+    setDetailOpen(false);
+    setEditOpen(true);
+  }
 
   function handleItemClick(item: WorkItem) {
     setSelectedItem(item);
@@ -121,13 +128,82 @@ export default function WorkPage({ workItems, setWorkItems }: Props) {
     setSearchParams({});
   }
 
+  function handleUpdateWork(data: {
+    title: string;
+    description: string;
+    status: WorkItem["status"];
+    priority: WorkItem["priority"];
+    dueDate: string;
+  }) {
+    if (!selectedItem) {
+      return;
+    }
+
+    setWorkItems((current) =>
+      current.map((item) =>
+        item.id === selectedItem.id
+          ? {
+              ...item,
+              title: data.title,
+              description: data.description,
+              status: data.status,
+              priority: data.priority,
+              dueDate: data.dueDate || undefined,
+            }
+          : item,
+      ),
+    );
+
+    setSelectedItem((current) =>
+      current
+        ? {
+            ...current,
+            title: data.title,
+            description: data.description,
+            status: data.status,
+            priority: data.priority,
+            dueDate: data.dueDate || undefined,
+          }
+        : null,
+    );
+
+    setEditOpen(false);
+    toast.success("Work updated");
+  }
+
   const hasFilters =
     Boolean(query) || Boolean(status) || Boolean(owner) || Boolean(priority);
+
+  function handleStatusChange(item: WorkItem, status: WorkStatus) {
+    setWorkItems((current) =>
+      current.map((currentItem) =>
+        currentItem.id === item.id
+          ? {
+              ...currentItem,
+              status,
+            }
+          : currentItem,
+      ),
+    );
+
+    if (selectedItem?.id === item.id) {
+      setSelectedItem((current) =>
+        current
+          ? {
+              ...current,
+              status,
+            }
+          : null,
+      );
+    }
+
+    toast.success("Status updated");
+  }
 
   return (
     <div>
       {/* Page heading */}
-      <div className="mb-6">
+      <div className="mb-3">
         <h2 className="text-2xl font-bold tracking-tight text-gray-900">
           Work
         </h2>
@@ -138,7 +214,7 @@ export default function WorkPage({ workItems, setWorkItems }: Props) {
       </div>
 
       {/* Search + filters */}
-      <div className="mb-5">
+      <div className="mb-2">
         <div className="flex flex-col gap-3 lg:flex-row">
           {/* Search */}
           <div className="relative min-w-0 flex-1">
@@ -347,14 +423,25 @@ export default function WorkPage({ workItems, setWorkItems }: Props) {
       </div>
 
       {/* Board */}
-      <WorkBoard items={paginatedItems} onItemClick={handleItemClick} />
+      <WorkBoard
+        items={paginatedItems}
+        onItemClick={handleItemClick}
+        onStatusChange={handleStatusChange}
+      />
+
       <WorkDetailDrawer
         item={selectedItem}
         open={detailOpen}
         onOpenChange={setDetailOpen}
-        onEdit={() => {
-          console.log("Edit:", selectedItem);
-        }}
+        onEdit={handleEdit}
+      />
+
+      <WorkFormDialog
+        mode="edit"
+        item={selectedItem}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSubmit={handleUpdateWork}
       />
 
       {/* Pagination */}
