@@ -1,10 +1,18 @@
 import { Plus } from "lucide-react";
+import CreateWorkDialog from "../work/CreateWorkDialog";
 
 type Props = {
   children: React.ReactNode;
+  onCreateWork: (data: {
+    title: string;
+    description: string;
+    status: "backlog" | "in_progress" | "review" | "done";
+    priority: "low" | "medium" | "high" | "urgent";
+    dueDate: string;
+  }) => void;
 };
 
-export default function AppShell({ children }: Props) {
+export default function AppShell({ children, onCreateWork }: Props) {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
@@ -19,14 +27,7 @@ export default function AppShell({ children }: Props) {
             </p>
           </div>
 
-          <button
-            type="button"
-            className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 active:scale-[0.98]"
-          >
-            <Plus size={16} />
-            <span className="hidden sm:inline">New work</span>
-            <span className="sm:hidden">New</span>
-          </button>
+          <CreateWorkDialog onCreate={onCreateWork} />
         </div>
       </header>
 

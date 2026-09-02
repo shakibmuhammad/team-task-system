@@ -1,9 +1,13 @@
-import { Calendar, UserRound } from "lucide-react";
+import {
+  Calendar,
+  UserRound,
+} from "lucide-react";
 import type { WorkItem } from "../../types/work";
 import { getDueDateStatus } from "../../lib/date";
 
 type Props = {
   item: WorkItem;
+  onClick: () => void;
 };
 
 const priorityStyles = {
@@ -31,22 +35,43 @@ function formatDate(date?: string) {
   }).format(new Date(`${date}T00:00:00`));
 }
 
-export default function WorkCard({ item }: Props) {
+export default function WorkCard({
+  item,
+  onClick,
+}: Props) {
   const dueStatus = getDueDateStatus(item.dueDate);
 
   return (
     <article
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        if (
+          event.key === "Enter" ||
+          event.key === " "
+        ) {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="
         group
+        cursor-pointer
         rounded-xl
-        border border-gray-200
+        border
+        border-gray-200
         bg-white
         p-4
         shadow-sm
+        outline-none
         transition
         hover:-translate-y-0.5
         hover:border-gray-300
         hover:shadow-md
+        focus-visible:ring-2
+        focus-visible:ring-gray-900
+        focus-visible:ring-offset-2
       "
     >
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -67,16 +92,17 @@ export default function WorkCard({ item }: Props) {
 
         <button
           type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+          }}
           className="
             rounded-md
             p-1.5
             text-gray-400
-            opacity-70
             transition
             hover:bg-gray-100
             hover:text-gray-700
-            focus-visible:opacity-100
-            focus-visible:outline
+            focus-visible:outline-2
           "
           aria-label={`More options for ${item.title}`}
         >
@@ -84,15 +110,7 @@ export default function WorkCard({ item }: Props) {
         </button>
       </div>
 
-      <h3
-        className="
-          break-words
-          text-sm
-          font-semibold
-          leading-5
-          text-gray-900
-        "
-      >
+      <h3 className="break-words text-sm font-semibold leading-5 text-gray-900">
         {item.title}
       </h3>
 

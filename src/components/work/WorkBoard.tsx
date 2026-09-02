@@ -1,8 +1,12 @@
-import type { WorkItem, WorkStatus } from "../../types/work";
+import type {
+  WorkItem,
+  WorkStatus,
+} from "../../types/work";
 import WorkColumn from "./WorkColumn";
 
 type Props = {
   items: WorkItem[];
+  onItemClick: (item: WorkItem) => void;
 };
 
 const columns: {
@@ -27,7 +31,10 @@ const columns: {
   },
 ];
 
-export default function WorkBoard({ items }: Props) {
+export default function WorkBoard({
+  items,
+  onItemClick,
+}: Props) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
       {columns.map((column) => {
@@ -41,6 +48,7 @@ export default function WorkBoard({ items }: Props) {
             title={column.title}
             status={column.status}
             items={columnItems}
+            onItemClick={onItemClick}
           />
         );
       })}

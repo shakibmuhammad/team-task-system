@@ -1,9 +1,11 @@
-import { ArrowUpDown, Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import WorkBoard from "../components/work/WorkBoard";
-import { workItems, members } from "../data/fixtures";
-import type { Priority, WorkStatus } from "../types/work";
+import { members } from "../data/fixtures";
+import type { Priority, WorkItem, WorkStatus } from "../types/work";
 import MobileFilterSheet from "../components/work/MobileFilterSheet";
+import { useState } from "react";
+import WorkDetailDrawer from "../components/work/WorkDetailDrawer";
 
 const PAGE_SIZE = 20;
 
@@ -27,8 +29,17 @@ const priorityOptions: {
   { label: "Urgent", value: "urgent" },
 ];
 
-export default function WorkPage() {
+type Props = {
+  workItems: WorkItem[];
+  setWorkItems: React.Dispatch<
+    React.SetStateAction<WorkItem[]>
+  >;
+};
+
+export default function WorkPage({ workItems, setWorkItems }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedItem, setSelectedItem] = useState<WorkItem | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const query = searchParams.get("q") ?? "";
   const status = searchParams.get("status") as WorkStatus | null;
@@ -36,6 +47,11 @@ export default function WorkPage() {
   const priority = searchParams.get("priority") as Priority | null;
   const sort = searchParams.get("sort") ?? "created";
   const page = Number(searchParams.get("page") ?? "1");
+
+  function handleItemClick(item: WorkItem) {
+    setSelectedItem(item);
+    setDetailOpen(true);
+  }
 
   const filteredItems = workItems
     .filter((item) => {
@@ -331,7 +347,15 @@ export default function WorkPage() {
       </div>
 
       {/* Board */}
-      <WorkBoard items={paginatedItems} />
+      <WorkBoard items={paginatedItems} onItemClick={handleItemClick} />
+      <WorkDetailDrawer
+        item={selectedItem}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onEdit={() => {
+          console.log("Edit:", selectedItem);
+        }}
+      />
 
       {/* Pagination */}
       <div className="mt-6 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between">

@@ -5,11 +5,13 @@ type Props = {
   title: string;
   status: WorkStatus;
   items: WorkItem[];
+  onItemClick: (item: WorkItem) => void;
 };
 
 export default function WorkColumn({
   title,
   items,
+  onItemClick
 }: Props) {
   return (
     <section className="flex min-w-0 flex-col">
@@ -56,6 +58,7 @@ export default function WorkColumn({
           <WorkCard
             key={item.id}
             item={item}
+            onClick={() => onItemClick(item)}
           />
         ))}
       </div>
