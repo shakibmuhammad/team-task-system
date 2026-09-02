@@ -1,6 +1,9 @@
-import { workItems } from "../../data/fixtures";
-import type { WorkStatus } from "../../types/work";
+import type { WorkItem, WorkStatus } from "../../types/work";
 import WorkColumn from "./WorkColumn";
+
+type Props = {
+  items: WorkItem[];
+};
 
 const columns: {
   title: string;
@@ -24,11 +27,11 @@ const columns: {
   },
 ];
 
-export default function WorkBoard() {
+export default function WorkBoard({ items }: Props) {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
       {columns.map((column) => {
-        const items = workItems.filter(
+        const columnItems = items.filter(
           (item) => item.status === column.status
         );
 
@@ -37,7 +40,7 @@ export default function WorkBoard() {
             key={column.status}
             title={column.title}
             status={column.status}
-            items={items}
+            items={columnItems}
           />
         );
       })}
